@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("manager") // admin, manager
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Отношения
+  employees Employee[]
+  reports   Report[]
+}
+
+model Employee {
+  id              String     @id @default(cuid())
+  name            String
+  position        String
+  status          String     @default("active") // active, not_registered, fired
+  terminationDate DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  
+  // Отношения
+  userId          String
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timeEntries     TimeEntry[]
+  evaluations     PerformanceEvaluation[]
+  
+  @@map("employees")
+}
+
+model TimeEntry {
+  id        String   @id @default(cuid())
+  date      String   // Формат: YYYY-MM-DD
+  hours     Int      // 0-24
+  overtime  Int      @default(0)
+  dayType   String   @default("work") // work, sick, vacation, absent
+  score     Int?     // 1-4 оценка качества
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Отношения
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  @@unique([employeeId, date])
+  @@map("time_entries")
+}
+
+model PerformanceEvaluation {
+  id        String   @id @default(cuid())
+  score     Int      // 1-4
+  comment   String?
+  period    String   // Формат: YYYY-MM (для месяца)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Отношения
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  @@unique([employeeId, period])
+  @@map("performance_evaluations")
+}
+
+model PositionRate {
+  id        String  @id @default(cuid())
+  position  String  @unique
+  hourlyRate Float
+  areaNorm  Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("position_rates")
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  type        String   // advance, salary
+  period      String   // Формат: YYYY-MM
+  startDate   String   // Формат: YYYY-MM-DD
+  endDate     String   // Формат: YYYY-MM-DD
+  data        String   // JSON данные отчета
+  status      String   @default("draft") // draft, sent
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Отношения
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("reports")
+}
