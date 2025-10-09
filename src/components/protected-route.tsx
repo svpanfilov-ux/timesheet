@@ -1,7 +1,5 @@
-'use client'
-
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useLocation } from 'wouter'
 import { useAuth } from './auth-provider'
 
 interface ProtectedRouteProps {
@@ -11,21 +9,21 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth()
-  const router = useRouter()
+  const [, setLocation] = useLocation()
 
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        router.push('/login')
+        setLocation('/login')
         return
       }
-      
+
       if (requiredRole && user.role !== requiredRole) {
-        router.push('/login')
+        setLocation('/login')
         return
       }
     }
-  }, [user, isLoading, requiredRole, router])
+  }, [user, isLoading, requiredRole, setLocation])
 
   if (isLoading) {
     return (

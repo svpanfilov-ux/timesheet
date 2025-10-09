@@ -1,7 +1,5 @@
-'use client'
-
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
+import { useLocation } from 'wouter'
 
 interface User {
   id: string
@@ -22,7 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+  const [, setLocation] = useLocation()
 
   useEffect(() => {
     // Проверяем наличие токена при загрузке
@@ -71,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('authToken')
     localStorage.removeItem('user')
     setUser(null)
-    router.push('/login')
+    setLocation('/login')
   }
 
   return (

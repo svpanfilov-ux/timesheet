@@ -258,7 +258,7 @@ export function ReportsManagement() {
       'Сотрудник': item.employee.name,
       'Должность': item.employee.position,
       'Рабочие часы': item.workHours,
-      'Сверхурочные': item.overtimeHours,
+      'Сверхурочные часы': item.overtimeHours,
       'Больничные дни': item.sickDays,
       'Отпускные дни': item.vacationDays,
       'Прогулы': item.absentDays,

@@ -1,7 +1,5 @@
-'use client'
-
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useLocation } from 'wouter'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,7 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const router = useRouter()
+  const [, setLocation] = useLocation()
   const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,8 +40,8 @@ export default function LoginPage() {
           title: "Успешный вход",
           description: "Добро пожаловать в систему!",
         })
-        
-        router.push('/')
+
+        setLocation('/')
       } else {
         setError(data.error || 'Ошибка входа')
       }

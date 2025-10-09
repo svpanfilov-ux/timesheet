@@ -1,20 +1,18 @@
-'use client'
-
 import { useAuth } from '@/components/auth-provider'
 import { ProtectedRoute } from '@/components/protected-route'
 import { MainLayout } from '@/components/main-layout'
-import { useRouter } from 'next/navigation'
+import { useLocation } from 'wouter'
 import { useEffect } from 'react'
 
 export default function Home() {
   const { user, isLoading } = useAuth()
-  const router = useRouter()
+  const [, setLocation] = useLocation()
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/login')
+      setLocation('/login')
     }
-  }, [user, isLoading, router])
+  }, [user, isLoading, setLocation])
 
   if (isLoading) {
     return (
